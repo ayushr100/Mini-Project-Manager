@@ -27,7 +27,9 @@ namespace ProjectManagerAPI.Services
             {
                 Title = createTaskDto.Title,
                 DueDate = createTaskDto.DueDate,
-                ProjectId = projectId
+                ProjectId = projectId,
+                EstimatedHours = createTaskDto.EstimatedHours,
+                Dependencies = createTaskDto.Dependencies
             };
 
             _context.Tasks.Add(task);
@@ -40,7 +42,9 @@ namespace ProjectManagerAPI.Services
                 DueDate = task.DueDate,
                 IsCompleted = task.IsCompleted,
                 CreatedAt = task.CreatedAt,
-                ProjectId = task.ProjectId
+                ProjectId = task.ProjectId,
+                EstimatedHours = task.EstimatedHours,
+                Dependencies = task.Dependencies
             };
         }
 
@@ -56,6 +60,8 @@ namespace ProjectManagerAPI.Services
             task.Title = updateTaskDto.Title;
             task.DueDate = updateTaskDto.DueDate;
             task.IsCompleted = updateTaskDto.IsCompleted;
+            task.EstimatedHours = updateTaskDto.EstimatedHours;
+            task.Dependencies = updateTaskDto.Dependencies;
 
             await _context.SaveChangesAsync();
 
@@ -66,7 +72,9 @@ namespace ProjectManagerAPI.Services
                 DueDate = task.DueDate,
                 IsCompleted = task.IsCompleted,
                 CreatedAt = task.CreatedAt,
-                ProjectId = task.ProjectId
+                ProjectId = task.ProjectId,
+                EstimatedHours = task.EstimatedHours,
+                Dependencies = task.Dependencies
             };
         }
 

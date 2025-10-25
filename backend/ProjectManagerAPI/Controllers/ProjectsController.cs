@@ -12,10 +12,12 @@ namespace ProjectManagerAPI.Controllers
     public class ProjectsController : ControllerBase
     {
         private readonly IProjectService _projectService;
+        private readonly ISchedulerService _schedulerService;
 
-        public ProjectsController(IProjectService projectService)
+        public ProjectsController(IProjectService projectService, ISchedulerService schedulerService)
         {
             _projectService = projectService;
+            _schedulerService = schedulerService;
         }
 
         private int GetUserId()
@@ -65,6 +67,28 @@ namespace ProjectManagerAPI.Controllers
                 return NotFound(new { message = "Project not found" });
 
             return NoContent();
+        }
+
+        [HttpPost("{projectId}/schedule")]
+        public async Task<IActionResult> ScheduleTasks(int projectId, [FromBody] ScheduleRequestDto scheduleRequest)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var userId = GetUserId();
+            
+            // Verify user owns the project
+            var project = await _projectService.GetProjectByIdAsync(projectId, userId);
+            if (project == null)
+                return NotFound(new { message = "Project not found" });
+
+            // Process the scheduling request
+            var result = _schedulerService.ScheduleTasks(scheduleRequest);
+
+            if (!result.IsValid)
+                return BadRequest(new { message = result.Message });
+
+            return Ok(result);
         }
     }
 }

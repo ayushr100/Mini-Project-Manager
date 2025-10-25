@@ -19,6 +19,12 @@ namespace ProjectManagerAPI.Models
         [Required]
         public int ProjectId { get; set; }
 
+        // Smart Scheduler fields
+        [Range(0.1, 1000)]
+        public double? EstimatedHours { get; set; }
+
+        public string? Dependencies { get; set; } // JSON string of task IDs or titles
+
         // Navigation property
         public Project Project { get; set; } = null!;
     }

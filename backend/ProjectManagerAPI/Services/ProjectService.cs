@@ -53,7 +53,9 @@ namespace ProjectManagerAPI.Services
                     DueDate = t.DueDate,
                     IsCompleted = t.IsCompleted,
                     CreatedAt = t.CreatedAt,
-                    ProjectId = t.ProjectId
+                    ProjectId = t.ProjectId,
+                    EstimatedHours = t.EstimatedHours,
+                    Dependencies = t.Dependencies
                 }).OrderBy(t => t.IsCompleted).ThenBy(t => t.DueDate).ToList()
             };
         }

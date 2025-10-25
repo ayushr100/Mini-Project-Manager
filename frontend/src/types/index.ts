@@ -50,15 +50,39 @@ export interface Task {
   isCompleted: boolean;
   createdAt: string;
   projectId: number;
+  estimatedHours?: number;
+  dependencies?: string;
 }
 
 export interface CreateTaskData {
   title: string;
   dueDate?: string;
+  estimatedHours?: number;
+  dependencies?: string;
 }
 
 export interface UpdateTaskData {
   title: string;
   dueDate?: string;
   isCompleted: boolean;
+  estimatedHours?: number;
+  dependencies?: string;
+}
+
+// Smart Scheduler types
+export interface TaskScheduleData {
+  title: string;
+  estimatedHours: number;
+  dueDate: string;
+  dependencies: string[];
+}
+
+export interface ScheduleRequestData {
+  tasks: TaskScheduleData[];
+}
+
+export interface ScheduleResponseData {
+  recommendedOrder: string[];
+  message?: string;
+  isValid: boolean;
 }

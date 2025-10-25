@@ -85,4 +85,12 @@ export const tasksAPI = {
   },
 };
 
+// Smart Scheduler API
+export const schedulerApi = {
+  scheduleTasks: async (projectId: number, scheduleData: import('../types').ScheduleRequestData): Promise<import('../types').ScheduleResponseData> => {
+    const response = await api.post(`/projects/${projectId}/schedule`, scheduleData);
+    return response.data;
+  },
+};
+
 export default api;

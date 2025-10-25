@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Project, Task, CreateTaskData, UpdateTaskData } from '../types';
 import { projectsAPI, tasksAPI } from '../services/api';
 import Navbar from '../components/Navbar';
+import SmartScheduler from '../components/SmartScheduler';
 
 const ProjectDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -14,6 +15,8 @@ const ProjectDetails: React.FC = () => {
   const [createFormData, setCreateFormData] = useState<CreateTaskData>({
     title: '',
     dueDate: '',
+    estimatedHours: undefined,
+    dependencies: undefined,
   });
   const [error, setError] = useState('');
 
@@ -29,10 +32,13 @@ const ProjectDetails: React.FC = () => {
       const data = await projectsAPI.getById(projectId);
       setProject(data);
     } catch (error: any) {
+      console.error('Error loading project:', error);
       if (error.response?.status === 404) {
-        navigate('/');
+        setError('Project not found');
+      } else if (error.response?.status === 401) {
+        setError('Unauthorized - please log in again');
       } else {
-        setError('Failed to load project');
+        setError(`Failed to load project: ${error.response?.data?.message || error.message || 'Unknown error'}`);
       }
     } finally {
       setIsLoading(false);
@@ -45,7 +51,7 @@ const ProjectDetails: React.FC = () => {
 
     try {
       await tasksAPI.create(project.id, createFormData);
-      setCreateFormData({ title: '', dueDate: '' });
+      setCreateFormData({ title: '', dueDate: '', estimatedHours: undefined, dependencies: undefined });
       setShowCreateForm(false);
       setError('');
       loadProject(project.id);
@@ -124,11 +130,34 @@ const ProjectDetails: React.FC = () => {
     );
   }
 
+  if (error) {
+    return (
+      <>
+        <Navbar />
+        <div style={styles.container}>
+          <div style={styles.header}>
+            <button style={styles.backBtn} onClick={() => navigate('/')}>
+              ← Back to Dashboard
+            </button>
+          </div>
+          <div style={styles.error}>{error}</div>
+        </div>
+      </>
+    );
+  }
+
   if (!project) {
     return (
       <>
         <Navbar />
-        <div style={styles.error}>Project not found</div>
+        <div style={styles.container}>
+          <div style={styles.header}>
+            <button style={styles.backBtn} onClick={() => navigate('/')}>
+              ← Back to Dashboard
+            </button>
+          </div>
+          <div style={styles.error}>Project not found</div>
+        </div>
       </>
     );
   }
@@ -165,12 +194,22 @@ const ProjectDetails: React.FC = () => {
         <div style={styles.tasksSection}>
           <div style={styles.tasksHeader}>
             <h2>Tasks</h2>
-            <button
-              style={styles.createBtn}
-              onClick={() => setShowCreateForm(!showCreateForm)}
-            >
-              {showCreateForm ? 'Cancel' : 'Add Task'}
-            </button>
+            <div style={styles.headerButtons}>
+              <button
+                style={styles.createBtn}
+                onClick={() => setShowCreateForm(!showCreateForm)}
+              >
+                {showCreateForm ? 'Cancel' : 'Add Task'}
+              </button>
+              <SmartScheduler 
+                projectId={project.id} 
+                tasks={project.tasks}
+                onScheduleGenerated={(order) => {
+                  console.log('Recommended order:', order);
+                  // You could show a notification or update the UI to reflect the recommended order
+                }}
+              />
+            </div>
           </div>
 
           {showCreateForm && (
@@ -201,6 +240,34 @@ const ProjectDetails: React.FC = () => {
                       setCreateFormData({ ...createFormData, dueDate: e.target.value })
                     }
                     style={styles.input}
+                  />
+                </div>
+                <div style={styles.inputGroup}>
+                  <label htmlFor="estimatedHours">Estimated Hours</label>
+                  <input
+                    type="number"
+                    id="estimatedHours"
+                    min="0.1"
+                    step="any"
+                    value={createFormData.estimatedHours || ''}
+                    onChange={(e) =>
+                      setCreateFormData({ ...createFormData, estimatedHours: e.target.value ? parseFloat(e.target.value) : undefined })
+                    }
+                    style={styles.input}
+                    placeholder="Hours needed to complete"
+                  />
+                </div>
+                <div style={styles.inputGroup}>
+                  <label htmlFor="dependencies">Dependencies (comma-separated task titles)</label>
+                  <input
+                    type="text"
+                    id="dependencies"
+                    value={createFormData.dependencies || ''}
+                    onChange={(e) =>
+                      setCreateFormData({ ...createFormData, dependencies: e.target.value })
+                    }
+                    style={styles.input}
+                    placeholder="e.g., Setup Database, Design API"
                   />
                 </div>
                 <div style={styles.formActions}>
@@ -239,6 +306,26 @@ const ProjectDetails: React.FC = () => {
                         }
                         style={styles.input}
                       />
+                      <input
+                        type="number"
+                        min="0.1"
+                        step="any"
+                        value={editingTask.estimatedHours || ''}
+                        onChange={(e) =>
+                          setEditingTask({ ...editingTask, estimatedHours: e.target.value ? parseFloat(e.target.value) : undefined })
+                        }
+                        style={styles.input}
+                        placeholder="Estimated hours"
+                      />
+                      <input
+                        type="text"
+                        value={editingTask.dependencies || ''}
+                        onChange={(e) =>
+                          setEditingTask({ ...editingTask, dependencies: e.target.value })
+                        }
+                        style={styles.input}
+                        placeholder="Dependencies (comma-separated)"
+                      />
                       <div style={styles.editActions}>
                         <button
                           style={styles.saveBtn}
@@ -246,6 +333,8 @@ const ProjectDetails: React.FC = () => {
                             title: editingTask.title,
                             dueDate: editingTask.dueDate,
                             isCompleted: editingTask.isCompleted,
+                            estimatedHours: editingTask.estimatedHours,
+                            dependencies: editingTask.dependencies,
                           })}
                         >
                           Save
@@ -278,6 +367,16 @@ const ProjectDetails: React.FC = () => {
                             {task.dueDate && (
                               <span style={styles.dueDate}>
                                 Due: {formatDate(task.dueDate)}
+                              </span>
+                            )}
+                            {task.estimatedHours && (
+                              <span style={styles.estimatedHours}>
+                                Est: {task.estimatedHours}h
+                              </span>
+                            )}
+                            {task.dependencies && (
+                              <span style={styles.dependencies}>
+                                Deps: {task.dependencies}
                               </span>
                             )}
                             <span style={styles.createdDate}>
@@ -385,6 +484,11 @@ const styles = {
     alignItems: 'center',
     marginBottom: '1.5rem',
   },
+  headerButtons: {
+    display: 'flex',
+    gap: '10px',
+    alignItems: 'center',
+  },
   createBtn: {
     backgroundColor: '#27ae60',
     color: 'white',
@@ -463,7 +567,19 @@ const styles = {
     fontSize: '0.8rem',
     color: '#7f8c8d',
   },
-  dueDate: {},
+  dueDate: {
+    color: '#e67e22',
+    fontWeight: 'bold' as const,
+  },
+  estimatedHours: {
+    color: '#3498db',
+    fontWeight: 'bold' as const,
+  },
+  dependencies: {
+    color: '#9b59b6',
+    fontWeight: 'bold' as const,
+    fontSize: '0.75rem',
+  },
   createdDate: {},
   taskActions: {
     display: 'flex',

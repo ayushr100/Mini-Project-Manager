@@ -11,6 +11,7 @@ This application provides a comprehensive project management solution with user 
 - 🔐 **Secure Authentication**: JWT-based authentication with PBKDF2 password hashing
 - 📋 **Project Management**: Create, view, and manage projects with progress tracking
 - ✅ **Task Management**: Add, edit, and track tasks with due dates and completion status
+- 🤖 **Smart Scheduler**: Intelligent task scheduling with dependency resolution using topological sorting
 - 📱 **Responsive Design**: Modern UI that works across all device sizes
 - ⚡ **Real-time Updates**: Dynamic progress indicators and status updates
 - 💾 **Data Persistence**: SQLite database for reliable data storage
@@ -202,7 +203,90 @@ PUT    /api/tasks/{taskId}              # Update task
 DELETE /api/tasks/{taskId}              # Delete task
 ```
 
+### 🤖 Smart Scheduler
+```http
+POST   /api/projects/{projectId}/schedule   # Generate optimal task schedule
+```
+
+The Smart Scheduler uses **algorithmic intelligence** to automatically organize tasks based on their dependencies and deadlines. Here's how it works:
+
+#### 🧠 Scheduling Methodology
+
+**Algorithm**: **Topological Sorting with Deadline Prioritization**
+
+1. **Dependency Graph Construction**: 
+   - Creates a directed acyclic graph (DAG) where tasks are nodes and dependencies are edges
+   - Validates that all specified dependencies exist in the task list
+
+2. **Topological Sorting**:
+   - Uses Kahn's algorithm to find a linear ordering of tasks that respects all dependencies
+   - Ensures no task is scheduled before its prerequisites are completed
+
+3. **Deadline Prioritization**:
+   - Among tasks with no remaining dependencies, prioritizes those with earlier due dates
+   - Uses a priority queue to efficiently select the next task to schedule
+
+4. **Circular Dependency Detection**:
+   - Automatically detects impossible dependency chains (e.g., Task A depends on Task B, which depends on Task A)
+   - Returns an error if circular dependencies are found
+
+5. **Feasibility Validation**:
+   - Considers estimated hours and working hours per day (8 hours default)
+   - Calculates if tasks can realistically be completed by their due dates
+
+**Why This Approach?**
+- **Deterministic**: Always produces the same optimal schedule for the same input
+- **Efficient**: O(V + E) time complexity where V = tasks, E = dependencies  
+- **Reliable**: Mathematically proven to find valid ordering if one exists
+- **Practical**: Considers real-world constraints like deadlines and work capacity
+
 **📝 Note**: All project and task endpoints require JWT authentication in the `Authorization` header.
+
+#### Smart Scheduler Request Example:
+```json
+{
+  "tasks": [
+    {
+      "title": "Design API",
+      "estimatedHours": 5,
+      "dueDate": "2025-10-25",
+      "dependencies": []
+    },
+    {
+      "title": "Implement Backend", 
+      "estimatedHours": 12,
+      "dueDate": "2025-10-28",
+      "dependencies": ["Design API"]
+    },
+    {
+      "title": "Build Frontend",
+      "estimatedHours": 10, 
+      "dueDate": "2025-10-30",
+      "dependencies": ["Design API"]
+    },
+    {
+      "title": "End-to-End Test",
+      "estimatedHours": 8,
+      "dueDate": "2025-10-31", 
+      "dependencies": ["Implement Backend", "Build Frontend"]
+    }
+  ]
+}
+```
+
+#### Smart Scheduler Response Example:
+```json
+{
+  "recommendedOrder": [
+    "Design API",
+    "Implement Backend", 
+    "Build Frontend",
+    "End-to-End Test"
+  ],
+  "isValid": true,
+  "message": "Tasks scheduled successfully."
+}
+```
 
 ## 🧪 Usage Guide
 
