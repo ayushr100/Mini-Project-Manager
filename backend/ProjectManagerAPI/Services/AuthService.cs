@@ -73,7 +73,11 @@ namespace ProjectManagerAPI.Services
         public string GenerateJwtToken(string username, string email, int userId)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_configuration["JwtSettings:SecretKey"]!);
+            var secretKey = Environment.GetEnvironmentVariable("JWT_SECRET") ?? _configuration["JwtSettings:SecretKey"];
+            var issuer = Environment.GetEnvironmentVariable("JWT_ISSUER") ?? _configuration["JwtSettings:Issuer"];
+            var audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? _configuration["JwtSettings:Audience"];
+            
+            var key = Encoding.ASCII.GetBytes(secretKey!);
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
@@ -85,8 +89,8 @@ namespace ProjectManagerAPI.Services
                 }),
                 Expires = DateTime.UtcNow.AddDays(7),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
-                Issuer = _configuration["JwtSettings:Issuer"],
-                Audience = _configuration["JwtSettings:Audience"]
+                Issuer = issuer,
+                Audience = audience
             };
 
             var token = tokenHandler.CreateToken(tokenDescriptor);

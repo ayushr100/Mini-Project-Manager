@@ -36,13 +36,11 @@ git push origin main
 3. **Configure Environment Variables:**
    - In Railway dashboard, go to your project
    - Click "Variables" tab
-   - Add these variables:
+   - Add these variables **EXACTLY** as shown:
      ```
      ASPNETCORE_ENVIRONMENT=Production
-     JWT_SECRET=your-super-secure-jwt-secret-key-minimum-32-characters
+     JWT_SECRET=kt0gEdcvnb1yTFWG9QCHS82Cb7EVSRzca9KSWE1MBh4=
      ```
-   
-   **⚠️ Important:** Make your JWT_SECRET at least 32 characters long!
 
 4. **Deploy:**
    - Railway will automatically detect the Dockerfile

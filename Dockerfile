@@ -1,7 +1,6 @@
 # Railway Dockerfile for .NET 8 Project Manager API
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
-# Railway provides dynamic PORT, don't hardcode
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
@@ -30,5 +29,5 @@ RUN mkdir -p /app/Data
 # Set environment variables
 ENV ASPNETCORE_ENVIRONMENT=Production
 
-# Railway provides PORT environment variable
+# Railway will set PORT environment variable automatically
 ENTRYPOINT ["dotnet", "ProjectManagerAPI.dll"]
