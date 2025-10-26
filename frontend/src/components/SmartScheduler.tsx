@@ -24,7 +24,6 @@ const SmartScheduler: React.FC<SmartSchedulerProps> = ({ projectId, tasks, onSch
         if (task.dueDate) {
           try {
             // Parse the date as local date to avoid timezone issues
-            let date;
             if (task.dueDate.includes('T')) {
               // If it already has time, just use the date part
               formattedDueDate = task.dueDate.split('T')[0];

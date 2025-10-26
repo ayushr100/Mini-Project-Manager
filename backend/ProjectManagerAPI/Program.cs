@@ -34,10 +34,27 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp", policy =>
     {
-        policy.WithOrigins("http://localhost:3000", "http://localhost:5266")
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials();
+        if (builder.Environment.IsDevelopment())
+        {
+            policy.WithOrigins(
+                    "http://localhost:3000", 
+                    "http://localhost:5266",
+                    "https://localhost:7165"
+                  )
+                  .AllowAnyHeader()
+                  .AllowAnyMethod()
+                  .AllowCredentials();
+        }
+        else
+        {
+            policy.WithOrigins(
+                    "https://*.vercel.app"
+                  )
+                  .AllowAnyHeader()
+                  .AllowAnyMethod()
+                  .AllowCredentials()
+                  .SetIsOriginAllowedToAllowWildcardSubdomains();
+        }
     });
 });
 
@@ -85,6 +102,13 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
+// Configure for Railway deployment
+if (!app.Environment.IsDevelopment())
+{
+    var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+    app.Urls.Add($"http://*:{port}");
+}
+
 // Create database
 using (var scope = app.Services.CreateScope())
 {
@@ -93,11 +117,8 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 

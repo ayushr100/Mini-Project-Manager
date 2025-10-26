@@ -1,16 +1,12 @@
-# Project Manager
+# Mini Project Manager
 
-A modern full-stack project management application built with .NET 8 Web API backend and React TypeScript frontend. Features secure authentication, project organization, and task management capabilities.
+A modern full-stack project management application built with .NET 8 Web API backend and React 19 TypeScript frontend. Features secure authentication, project organization, task management, and an intelligent Smart Scheduler with dependency resolution.
 
-## Overview
-
-This application provides a comprehensive project management solution with user authentication, project creation and organization, and detailed task management. Built using industry-standard technologies and following clean architecture principles.
-
-### Key Features
+## 🌟 Key Features
 
 - 🔐 **Secure Authentication**: JWT-based authentication with PBKDF2 password hashing
 - 📋 **Project Management**: Create, view, and manage projects with progress tracking
-- ✅ **Task Management**: Add, edit, and track tasks with due dates and completion status
+- ✅ **Task Management**: Add, edit, and track tasks with due dates, estimated hours, and dependencies
 - 🤖 **Smart Scheduler**: Intelligent task scheduling with dependency resolution using topological sorting
 - 📱 **Responsive Design**: Modern UI that works across all device sizes
 - ⚡ **Real-time Updates**: Dynamic progress indicators and status updates
@@ -20,7 +16,7 @@ This application provides a comprehensive project management solution with user 
 
 ### Backend
 - **Framework**: ASP.NET Core 8.0 ⚙️
-- **ORM**: Entity Framework Core 🗄️
+- **ORM**: Entity Framework Core 9.0.10 🗄️
 - **Database**: SQLite 💾
 - **Authentication**: JWT (JSON Web Tokens) 🔐
 - **Documentation**: Swagger/OpenAPI 📚
@@ -32,7 +28,61 @@ This application provides a comprehensive project management solution with user 
 - **HTTP Client**: Axios 🌐
 - **State Management**: React Context API 🔄
 
-## Architecture
+## 🚀 Quick Start (Local Development)
+
+### Prerequisites
+- .NET 8 SDK
+- Node.js 18+ and npm
+- Git
+
+### One-Command Setup
+
+#### Windows:
+```batch
+# Clone the repository
+git clone https://github.com/ayushr100/Mini-Project-Manager.git
+cd Mini-Project-Manager
+
+# Start both backend and frontend
+run-dev.bat
+```
+
+#### Mac/Linux:
+```bash
+# Clone the repository
+git clone https://github.com/ayushr100/Mini-Project-Manager.git
+cd Mini-Project-Manager
+
+# Start both backend and frontend
+./run-dev.sh
+```
+
+This will automatically:
+- Install all dependencies
+- Set up the database
+- Start backend on `https://localhost:7165`
+- Start frontend on `http://localhost:3000`
+- Open API documentation at `https://localhost:7165/swagger`
+
+### Manual Setup (For Debugging)
+If you need to run services separately for debugging:
+
+1. **Backend Setup:**
+   ```bash
+   cd backend/ProjectManagerAPI
+   dotnet restore
+   dotnet ef database update
+   dotnet run
+   ```
+
+2. **Frontend Setup:**
+   ```bash
+   cd frontend
+   npm install
+   npm start
+   ```
+
+## 🏗️ Architecture
 
 The application follows clean architecture principles with clear separation of concerns:
 
@@ -45,7 +95,7 @@ The application follows clean architecture principles with clear separation of c
 
 ### Frontend Architecture
 - **Pages**: Main application views (Login, Dashboard, Project Details)
-- **Components**: Reusable UI components
+- **Components**: Reusable UI components (including SmartScheduler)
 - **Services**: API communication layer
 - **Context**: Authentication and state management
 - **Types**: TypeScript interfaces and type definitions
@@ -54,6 +104,13 @@ The application follows clean architecture principles with clear separation of c
 
 ```
 Mini Project Manager/
+├── run-dev.sh                    # 🚀 Development launcher (Mac/Linux)
+├── run-dev.bat                   # 🚀 Development launcher (Windows)
+├── Dockerfile                    # 🐳 Railway deployment config
+├── railway.json                  # 🚂 Railway settings
+├── start.sh                      # 🔄 Fallback deployment script
+├── README.md                     # 📖 Project documentation
+├── DEPLOYMENT_GUIDE.md           # 🚀 Deployment instructions
 ├── backend/
 │   └── ProjectManagerAPI/
 │       ├── Controllers/           # API endpoints
@@ -63,21 +120,20 @@ Mini Project Manager/
 │       ├── Services/              # Business logic
 │       │   ├── AuthService.cs
 │       │   ├── ProjectService.cs
-│       │   └── TaskService.cs
+│       │   ├── TaskService.cs
+│       │   └── SchedulerService.cs
 │       ├── Models/                # Data entities
 │       │   ├── User.cs
 │       │   ├── Project.cs
 │       │   └── ProjectTask.cs
 │       ├── DTOs/                  # Data transfer objects
-│       │   ├── AuthDto.cs
-│       │   ├── ProjectDto.cs
-│       │   └── TaskDto.cs
-│       ├── Data/                  # Database context
-│       │   └── ApplicationDbContext.cs
+│       ├── Data/                  # Database context & migrations
 │       └── Program.cs             # Application configuration
 ├── frontend/
+│   ├── vercel.json               # ⚡ Vercel deployment config
+│   ├── .env.production           # 🔧 Production environment variables
 │   ├── src/
-│   │   ├── pages/                 # Main application pages
+│   │   ├── pages/                # Main application pages
 │   │   │   ├── Login.tsx
 │   │   │   ├── Register.tsx
 │   │   │   ├── Dashboard.tsx
@@ -364,6 +420,45 @@ dotnet test
 cd frontend
 npm test
 ```
+
+## 🚀 Production Deployment
+
+This application is configured for deployment on Railway (backend) and Vercel (frontend).
+
+### Quick Deployment Steps
+
+1. **Push to GitHub:**
+   ```bash
+   git add .
+   git commit -m "Ready for deployment"
+   git push origin main
+   ```
+
+2. **Deploy Backend to Railway:**
+   - Go to [Railway.app](https://railway.app)
+   - Connect your GitHub repository
+   - Set environment variables:
+     - `ASPNETCORE_ENVIRONMENT=Production`
+     - `JWT_SECRET=your-super-secure-jwt-secret-key-minimum-32-characters`
+   - Railway will auto-deploy using the Dockerfile
+
+3. **Deploy Frontend to Vercel:**
+   - Go to [Vercel.com](https://vercel.com)
+   - Connect your GitHub repository
+   - Set environment variable:
+     - `REACT_APP_API_URL=https://your-railway-app.railway.app/api`
+   - Vercel will auto-deploy the React app
+
+### Deployment Files Included
+
+- `Dockerfile` - Railway backend deployment
+- `railway.json` - Railway configuration
+- `start.sh` - Fallback deployment script
+- `nixpacks.toml` - Alternative Railway config
+- `frontend/vercel.json` - Vercel configuration
+- `frontend/.env.production` - Production environment variables
+
+For detailed deployment instructions, see [DEPLOYMENT.md](DEPLOYMENT.md)
 
 ## 🤝 Contributing
 
