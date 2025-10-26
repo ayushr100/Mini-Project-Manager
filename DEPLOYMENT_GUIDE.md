@@ -74,7 +74,7 @@ git push origin main
    - In project settings, go to "Environment Variables"
    - Add:
      ```
-     REACT_APP_API_URL=https://your-railway-app.railway.app/api
+     REACT_APP_API_URL=https://mini-project-manager-production.up.railway.app/api
      ```
    
    **⚠️ Replace** `your-railway-app.railway.app` with your actual Railway URL!
