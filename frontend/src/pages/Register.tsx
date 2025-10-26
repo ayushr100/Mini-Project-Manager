@@ -15,12 +15,6 @@ const Register: React.FC = () => {
   const { register } = useAuth();
   const navigate = useNavigate();
 
-  // Clear error after showing it for a reasonable duration
-  const showError = (message: string) => {
-    setError(message);
-    // Don't auto-clear error - let user see it until next form interaction
-  };
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // Clear error when user starts typing again
     if (error) setError('');
@@ -32,14 +26,23 @@ const Register: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Prevent multiple submissions
+    if (isLoading) return;
+    
     setIsLoading(true);
     setError(''); // Clear any existing error
 
     try {
       await register(formData);
+      // Only navigate on successful registration
       navigate('/');
     } catch (error: any) {
-      showError(error.response?.data?.message || 'Registration failed');
+      // Set error message and keep it visible
+      const errorMessage = error.response?.data?.message || 'Registration failed. Please try again.';
+      setError(errorMessage);
+      
+      // Don't navigate on error - stay on register page
     } finally {
       setIsLoading(false);
     }
@@ -49,7 +52,7 @@ const Register: React.FC = () => {
     <div style={styles.container}>
       <div style={styles.formContainer}>
         <h2 style={styles.title}>Register</h2>
-        <form onSubmit={handleSubmit} style={styles.form}>
+        <form onSubmit={handleSubmit} style={styles.form} noValidate>
           <div style={styles.inputGroup}>
             <label htmlFor="username">Username</label>
             <input
@@ -91,7 +94,11 @@ const Register: React.FC = () => {
             />
             <small style={styles.helpText}>Password must be at least 6 characters long</small>
           </div>
-          {error && <div style={styles.error}>{error}</div>}
+          {error && (
+            <div style={styles.error} role="alert">
+              {error}
+            </div>
+          )}
           <button
             type="submit"
             disabled={isLoading}
@@ -161,6 +168,12 @@ const styles = {
     color: '#e74c3c',
     fontSize: '0.9rem',
     textAlign: 'center' as const,
+    backgroundColor: '#fdf2f2',
+    border: '1px solid #e74c3c',
+    borderRadius: '4px',
+    padding: '0.75rem',
+    marginTop: '0.5rem',
+    marginBottom: '0.5rem',
   },
   linkText: {
     textAlign: 'center' as const,

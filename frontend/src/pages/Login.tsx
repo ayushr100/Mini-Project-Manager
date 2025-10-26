@@ -14,12 +14,6 @@ const Login: React.FC = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  // Clear error after showing it for a reasonable duration
-  const showError = (message: string) => {
-    setError(message);
-    // Don't auto-clear error - let user see it until next form interaction
-  };
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // Clear error when user starts typing again
     if (error) setError('');
@@ -31,14 +25,23 @@ const Login: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Prevent multiple submissions
+    if (isLoading) return;
+    
     setIsLoading(true);
     setError(''); // Clear any existing error
 
     try {
       await login(formData);
+      // Only navigate on successful login
       navigate('/');
     } catch (error: any) {
-      showError(error.response?.data?.message || 'Login failed');
+      // Set error message and keep it visible
+      const errorMessage = error.response?.data?.message || 'Invalid credentials. Please try again.';
+      setError(errorMessage);
+      
+      // Don't navigate on error - stay on login page
     } finally {
       setIsLoading(false);
     }
@@ -48,7 +51,7 @@ const Login: React.FC = () => {
     <div style={styles.container}>
       <div style={styles.formContainer}>
         <h2 style={styles.title}>Login</h2>
-        <form onSubmit={handleSubmit} style={styles.form}>
+        <form onSubmit={handleSubmit} style={styles.form} noValidate>
           <div style={styles.inputGroup}>
             <label htmlFor="usernameOrEmail">Username or Email</label>
             <input
@@ -59,6 +62,7 @@ const Login: React.FC = () => {
               onChange={handleChange}
               required
               style={styles.input}
+              autoComplete="username"
             />
           </div>
           <div style={styles.inputGroup}>
@@ -71,9 +75,14 @@ const Login: React.FC = () => {
               onChange={handleChange}
               required
               style={styles.input}
+              autoComplete="current-password"
             />
           </div>
-          {error && <div style={styles.error}>{error}</div>}
+          {error && (
+            <div style={styles.error} role="alert">
+              {error}
+            </div>
+          )}
           <button
             type="submit"
             disabled={isLoading}
@@ -143,6 +152,12 @@ const styles = {
     color: '#e74c3c',
     fontSize: '0.9rem',
     textAlign: 'center' as const,
+    backgroundColor: '#fdf2f2',
+    border: '1px solid #e74c3c',
+    borderRadius: '4px',
+    padding: '0.75rem',
+    marginTop: '0.5rem',
+    marginBottom: '0.5rem',
   },
   linkText: {
     textAlign: 'center' as const,

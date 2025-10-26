@@ -1,469 +1,205 @@
-# Mini Project Manager
+# 🚀 Mini Project Manager
 
-A modern full-stack project management application built with .NET 8 Web API backend and React 19 TypeScript frontend. Features secure authentication, project organization, task management, and an intelligent Smart Scheduler with dependency resolution.
+> A modern full-stack project management application with intelligent task scheduling
 
-## 🌟 Key Features
+Built with .NET 8 Web API backend and React 19 TypeScript frontend, featuring secure authentication, project organization, task management, and an AI-powered Smart Scheduler with dependency resolution.
 
-- 🔐 **Secure Authentication**: JWT-based authentication with PBKDF2 password hashing
-- 📋 **Project Management**: Create, view, and manage projects with progress tracking
-- ✅ **Task Management**: Add, edit, and track tasks with due dates, estimated hours, and dependencies
-- 🤖 **Smart Scheduler**: Intelligent task scheduling with dependency resolution using topological sorting
-- 📱 **Responsive Design**: Modern UI that works across all device sizes
-- ⚡ **Real-time Updates**: Dynamic progress indicators and status updates
-- 💾 **Data Persistence**: SQLite database for reliable data storage
+## 🌐 Live Demo
+
+**Try the deployed application:**
+- **🌟 Application**: [https://mini-project-manager-green.vercel.app/](https://mini-project-manager-green.vercel.app/)
+- **📡 API Documentation**: [https://mini-project-manager-production.up.railway.app/swagger](https://mini-project-manager-production.up.railway.app/swagger)
+
+**Quick Test Guide:**
+1. Register a new account
+2. Create a project and add tasks with dependencies
+3. Use the Smart Scheduler to automatically organize tasks
+4. Track progress with real-time updates
+
+## ⭐ Key Features
+
+| Feature | Description |
+|---------|-------------|
+| 🔐 **Secure Authentication** | JWT-based auth with PBKDF2 password hashing |
+| 📋 **Project Management** | Create, organize, and track multiple projects |
+| ✅ **Smart Task Management** | Tasks with due dates, estimated hours, and dependencies |
+| 🤖 **AI Scheduler** | Intelligent scheduling using topological sorting algorithm |
+| 📱 **Responsive Design** | Works seamlessly across all device sizes |
+| ⚡ **Real-time Updates** | Dynamic progress tracking and status indicators |
+| 💾 **Reliable Storage** | SQLite database with automatic migrations |
 
 ## 🛠️ Technology Stack
 
-### Backend
-- **Framework**: ASP.NET Core 8.0 ⚙️
-- **ORM**: Entity Framework Core 9.0.10 🗄️
-- **Database**: SQLite 💾
-- **Authentication**: JWT (JSON Web Tokens) 🔐
-- **Documentation**: Swagger/OpenAPI 📚
+### Backend (.NET 8)
+- **Framework**: ASP.NET Core 8.0
+- **ORM**: Entity Framework Core 9.0.10
+- **Database**: SQLite
+- **Authentication**: JWT with PBKDF2
+- **Documentation**: Swagger/OpenAPI
 
-### Frontend
-- **Framework**: React 19 ⚛️
-- **Language**: TypeScript 📘
-- **Routing**: React Router v7 🛣️
-- **HTTP Client**: Axios 🌐
-- **State Management**: React Context API 🔄
+### Frontend (React 19)
+- **Framework**: React 19 with TypeScript
+- **Routing**: React Router v7
+- **HTTP Client**: Axios
+- **State Management**: React Context API
+- **Build Tool**: Create React App
 
-## 🚀 Quick Start (Local Development)
+## 🚀 Quick Start
 
 ### Prerequisites
-- .NET 8 SDK
-- Node.js 18+ and npm
+- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
+- [Node.js 18+](https://nodejs.org/) with npm
 - Git
 
-### One-Command Setup
+### One-Command Launch
 
-#### Windows:
+**Windows:**
 ```batch
-# Clone the repository
 git clone https://github.com/ayushr100/Mini-Project-Manager.git
 cd Mini-Project-Manager
-
-# Start both backend and frontend
 run-dev.bat
 ```
 
-#### Mac/Linux:
+**Mac/Linux:**
 ```bash
-# Clone the repository
 git clone https://github.com/ayushr100/Mini-Project-Manager.git
 cd Mini-Project-Manager
-
-# Start both backend and frontend
-./run-dev.sh
+chmod +x run-dev.sh && ./run-dev.sh
 ```
 
-This will automatically:
-- Install all dependencies
-- Set up the database
-- Start backend on `https://localhost:7165`
-- Start frontend on `http://localhost:3000`
-- Open API documentation at `https://localhost:7165/swagger`
+This automatically:
+- ✅ Installs all dependencies
+- ✅ Sets up the database
+- ✅ Starts backend at `https://localhost:7165`
+- ✅ Starts frontend at `http://localhost:3000`
+- ✅ Opens Swagger docs at `https://localhost:7165/swagger`
 
-### Manual Setup (For Debugging)
-If you need to run services separately for debugging:
+### Manual Setup
+If you prefer step-by-step setup:
 
-1. **Backend Setup:**
-   ```bash
-   cd backend/ProjectManagerAPI
-   dotnet restore
-   dotnet ef database update
-   dotnet run
-   ```
+<details>
+<summary>Click to expand manual setup instructions</summary>
 
-2. **Frontend Setup:**
-   ```bash
-   cd frontend
-   npm install
-   npm start
-   ```
-
-## 🏗️ Architecture
-
-The application follows clean architecture principles with clear separation of concerns:
-
-### Backend Architecture
-- **Controllers**: Handle HTTP requests and responses
-- **Services**: Contain business logic and data processing
-- **Models**: Define data entities and relationships
-- **DTOs**: Data Transfer Objects for API communication
-- **Data Layer**: Entity Framework Core with SQLite
-
-### Frontend Architecture
-- **Pages**: Main application views (Login, Dashboard, Project Details)
-- **Components**: Reusable UI components (including SmartScheduler)
-- **Services**: API communication layer
-- **Context**: Authentication and state management
-- **Types**: TypeScript interfaces and type definitions
-
-## Project Structure
-
-```
-Mini Project Manager/
-├── run-dev.sh                    # 🚀 Development launcher (Mac/Linux)
-├── run-dev.bat                   # 🚀 Development launcher (Windows)
-├── Dockerfile                    # 🐳 Railway deployment config
-├── railway.json                  # 🚂 Railway settings
-├── start.sh                      # 🔄 Fallback deployment script
-├── README.md                     # 📖 Project documentation
-├── DEPLOYMENT_GUIDE.md           # 🚀 Deployment instructions
-├── backend/
-│   └── ProjectManagerAPI/
-│       ├── Controllers/           # API endpoints
-│       │   ├── AuthController.cs
-│       │   ├── ProjectsController.cs
-│       │   └── TasksController.cs
-│       ├── Services/              # Business logic
-│       │   ├── AuthService.cs
-│       │   ├── ProjectService.cs
-│       │   ├── TaskService.cs
-│       │   └── SchedulerService.cs
-│       ├── Models/                # Data entities
-│       │   ├── User.cs
-│       │   ├── Project.cs
-│       │   └── ProjectTask.cs
-│       ├── DTOs/                  # Data transfer objects
-│       ├── Data/                  # Database context & migrations
-│       └── Program.cs             # Application configuration
-├── frontend/
-│   ├── vercel.json               # ⚡ Vercel deployment config
-│   ├── .env.production           # 🔧 Production environment variables
-│   ├── src/
-│   │   ├── pages/                # Main application pages
-│   │   │   ├── Login.tsx
-│   │   │   ├── Register.tsx
-│   │   │   ├── Dashboard.tsx
-│   │   │   └── ProjectDetails.tsx
-│   │   ├── components/            # Reusable components
-│   │   │   ├── Navbar.tsx
-│   │   │   └── ProtectedRoute.tsx
-│   │   ├── context/               # State management
-│   │   │   └── AuthContext.tsx
-│   │   ├── services/              # API layer
-│   │   │   └── api.ts
-│   │   ├── types/                 # TypeScript definitions
-│   │   │   └── index.ts
-│   │   └── App.tsx                # Main application component
-│   └── package.json
-├── run.sh                         # Quick setup script (Unix)
-├── run.bat                        # Quick setup script (Windows)
-└── README.md
-```
-
-## 🚀 Installation and Setup
-
-### Prerequisites
-
-Ensure you have the following installed:
-- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) 🔧
-- [Node.js 16+](https://nodejs.org/) 📦
-- [npm](https://www.npmjs.com/) (comes with Node.js) 📥
-
-### ⚡ Quick Setup (Recommended)
-
-For fastest setup, use the provided automation scripts:
-
-**macOS/Linux:**
-```bash
-chmod +x run.sh
-./run.sh
-```
-
-**Windows:**
-```cmd
-run.bat
-```
-
-The script will automatically:
-1. ✅ Check for required prerequisites
-2. ✅ Install all dependencies
-3. ✅ Build both backend and frontend
-4. ✅ Start both services
-5. ✅ Open the application in your browser
-
-### 🛠️ Manual Setup
-
-If you prefer manual setup or the automated script fails:
-
-#### Backend Setup
-
-1. Navigate to the backend directory:
+**Backend:**
 ```bash
 cd backend/ProjectManagerAPI
-```
-
-2. Restore dependencies:
-```bash
 dotnet restore
-```
-
-3. Build the application:
-```bash
-dotnet build
-```
-
-4. Run the API server:
-```bash
+dotnet ef database update
 dotnet run
 ```
 
-🌐 **Backend URLs:**
-- API: `http://localhost:5266`
-- Swagger Documentation: `http://localhost:5266/swagger`
-
-#### Frontend Setup
-
-1. Open a new terminal and navigate to frontend directory:
+**Frontend (new terminal):**
 ```bash
 cd frontend
-```
-
-2. Install dependencies:
-```bash
 npm install
-```
-
-3. Start the development server:
-```bash
 npm start
 ```
+</details>
 
-🌐 **Frontend URL:** `http://localhost:3000`
+## 🏗️ Project Architecture
 
-## 📡 API Documentation
-
-> **Interactive Documentation**: Visit `http://localhost:5266/swagger` for complete API testing
-
-### 🔐 Authentication
-```http
-POST /api/auth/register   # User registration
-POST /api/auth/login      # User login
+```
+Mini-Project-Manager/
+├── 📁 backend/ProjectManagerAPI/     # .NET 8 Web API
+│   ├── Controllers/                 # API endpoints
+│   ├── Services/                   # Business logic
+│   ├── Models/                     # Data entities
+│   ├── DTOs/                       # Data transfer objects
+│   └── Data/                       # Database context
+├── 📁 frontend/                     # React 19 TypeScript
+│   ├── src/pages/                  # Application pages
+│   ├── src/components/             # Reusable components
+│   ├── src/services/               # API communication
+│   └── src/context/                # State management
+├── 🐳 Dockerfile                    # Railway deployment
+├── ⚡ frontend/vercel.json          # Vercel configuration
+└── 🚀 run-dev.{sh,bat}             # Development launchers
 ```
 
-### 📋 Projects
+## 🤖 Smart Scheduler Algorithm
+
+The Smart Scheduler uses **Topological Sorting with Deadline Prioritization**:
+
+1. **Dependency Analysis**: Creates a directed graph of task dependencies
+2. **Topological Sort**: Uses Kahn's algorithm for dependency-respecting order
+3. **Deadline Priority**: Prioritizes tasks with earlier due dates
+4. **Circular Detection**: Automatically detects and reports impossible dependency chains
+
+**API Endpoint:**
 ```http
-GET    /api/projects           # Get all user projects
-POST   /api/projects           # Create new project
-GET    /api/projects/{id}      # Get project details with tasks
+POST /api/projects/{projectId}/schedule
+```
+
+## 📡 API Reference
+
+### Authentication
+```http
+POST /api/auth/register    # User registration
+POST /api/auth/login       # User login
+```
+
+### Projects
+```http
+GET    /api/projects           # List user projects
+POST   /api/projects           # Create project
+GET    /api/projects/{id}      # Get project with tasks
 DELETE /api/projects/{id}      # Delete project
 ```
 
-### ✅ Tasks
+### Tasks
 ```http
-POST   /api/projects/{projectId}/tasks   # Create task in project
+POST   /api/projects/{projectId}/tasks   # Create task
 PUT    /api/tasks/{taskId}              # Update task
 DELETE /api/tasks/{taskId}              # Delete task
+POST   /api/projects/{projectId}/schedule # Auto-schedule tasks
 ```
 
-### 🤖 Smart Scheduler
-```http
-POST   /api/projects/{projectId}/schedule   # Generate optimal task schedule
-```
+> 📖 **Full API Documentation**: Available at `/swagger` endpoint
 
-The Smart Scheduler uses **algorithmic intelligence** to automatically organize tasks based on their dependencies and deadlines. Here's how it works:
+## 🌐 Production Deployment
 
-#### 🧠 Scheduling Methodology
+### Current Deployment Status
+✅ **Live and Production-Ready**
 
-**Algorithm**: **Topological Sorting with Deadline Prioritization**
+| Service | Platform | URL |
+|---------|----------|-----|
+| **Frontend** | Vercel | [mini-project-manager-green.vercel.app](https://mini-project-manager-green.vercel.app/) |
+| **Backend API** | Railway | [mini-project-manager-production.up.railway.app](https://mini-project-manager-production.up.railway.app/) |
+| **API Docs** | Railway | [/swagger](https://mini-project-manager-production.up.railway.app/swagger) |
 
-1. **Dependency Graph Construction**: 
-   - Creates a directed acyclic graph (DAG) where tasks are nodes and dependencies are edges
-   - Validates that all specified dependencies exist in the task list
+### Deployment Architecture
 
-2. **Topological Sorting**:
-   - Uses Kahn's algorithm to find a linear ordering of tasks that respects all dependencies
-   - Ensures no task is scheduled before its prerequisites are completed
+| Component | Platform | Technology | Auto-Deploy |
+|-----------|----------|------------|-------------|
+| **Frontend** | [Vercel](https://vercel.com) | Static Site Generation | ✅ On push to `main` |
+| **Backend** | [Railway](https://railway.app) | Docker Container | ✅ On push to `main` |
+| **Database** | Railway (with backend) | SQLite File | ✅ Persistent volume |
 
-3. **Deadline Prioritization**:
-   - Among tasks with no remaining dependencies, prioritizes those with earlier due dates
-   - Uses a priority queue to efficiently select the next task to schedule
+### Deployment Configuration
 
-4. **Circular Dependency Detection**:
-   - Automatically detects impossible dependency chains (e.g., Task A depends on Task B, which depends on Task A)
-   - Returns an error if circular dependencies are found
+**Backend (Railway):**
+- **Runtime**: Docker container using `Dockerfile`
+- **Environment**: `ASPNETCORE_ENVIRONMENT=Production`
+- **Security**: JWT secrets via environment variables
+- **Database**: SQLite with persistent storage
+- **Health Check**: `/health` endpoint with 300s timeout
 
-5. **Feasibility Validation**:
-   - Considers estimated hours and working hours per day (8 hours default)
-   - Calculates if tasks can realistically be completed by their due dates
+**Frontend (Vercel):**
+- **Framework**: Create React App
+- **Root Directory**: `frontend/`
+- **Build Command**: `npm run build`
+- **Environment**: `REACT_APP_API_URL` pointing to Railway backend
+- **Routing**: SPA routing via `vercel.json` configuration
 
-**Why This Approach?**
-- **Deterministic**: Always produces the same optimal schedule for the same input
-- **Efficient**: O(V + E) time complexity where V = tasks, E = dependencies  
-- **Reliable**: Mathematically proven to find valid ordering if one exists
-- **Practical**: Considers real-world constraints like deadlines and work capacity
-
-**📝 Note**: All project and task endpoints require JWT authentication in the `Authorization` header.
-
-#### Smart Scheduler Request Example:
-```json
-{
-  "tasks": [
-    {
-      "title": "Design API",
-      "estimatedHours": 5,
-      "dueDate": "2025-10-25",
-      "dependencies": []
-    },
-    {
-      "title": "Implement Backend", 
-      "estimatedHours": 12,
-      "dueDate": "2025-10-28",
-      "dependencies": ["Design API"]
-    },
-    {
-      "title": "Build Frontend",
-      "estimatedHours": 10, 
-      "dueDate": "2025-10-30",
-      "dependencies": ["Design API"]
-    },
-    {
-      "title": "End-to-End Test",
-      "estimatedHours": 8,
-      "dueDate": "2025-10-31", 
-      "dependencies": ["Implement Backend", "Build Frontend"]
-    }
-  ]
-}
-```
-
-#### Smart Scheduler Response Example:
-```json
-{
-  "recommendedOrder": [
-    "Design API",
-    "Implement Backend", 
-    "Build Frontend",
-    "End-to-End Test"
-  ],
-  "isValid": true,
-  "message": "Tasks scheduled successfully."
-}
-```
-
-## 🧪 Usage Guide
-
-### Getting Started
-
-1. 📝 **Register**: Create a new account by providing username, email, and password
-2. 🔑 **Login**: Sign in with your credentials to access the dashboard
-3. 📁 **Create Projects**: Add new projects with titles and descriptions
-4. ✅ **Manage Tasks**: Click on any project to add, edit, or delete tasks
-5. 📊 **Track Progress**: View completion statistics and progress indicators
-
-### Testing the Application
-
-#### 🖱️ Manual Testing
-1. Open `http://localhost:3000` in your browser
-2. Register a new user account
-3. Create a sample project and add tasks
-4. Test all CRUD operations
-5. Verify responsive design on different screen sizes
-
-#### 🔧 API Testing
-Visit `http://localhost:5266/swagger` for interactive API documentation and testing.
-
-## 🔒 Security Features
-
-- 🔐 **JWT Authentication**: Secure token-based authentication system
-- 🛡️ **Password Security**: PBKDF2 hashing with salt for password storage
-- 👤 **Authorization**: Users can only access their own data
-- 🌐 **CORS Configuration**: Properly configured for frontend-backend communication
-- ✅ **Input Validation**: Server-side validation using Data Annotations
-- 🛡️ **SQL Injection Prevention**: Entity Framework Core parameterized queries
-
-## ⚙️ Configuration
-
-### Backend Configuration (appsettings.json)
-```json
-{
-  "ConnectionStrings": {
-    "DefaultConnection": "Data Source=projectmanager.db"
-  },
-  "JwtSettings": {
-    "SecretKey": "your-secret-key-here",
-    "Issuer": "ProjectManagerAPI",
-    "Audience": "ProjectManagerClient"
-  }
-}
-```
-
-### 💾 Database
-The application uses SQLite for data storage. The database file (`projectmanager.db`) is automatically created in the backend directory when the application starts for the first time.
-
-## 🚀 Development
-
-### Building for Production
-
-#### Backend
-```bash
-cd backend/ProjectManagerAPI
-dotnet publish -c Release
-```
-
-#### Frontend
-```bash
-cd frontend
-npm run build
-```
-
-### 🧪 Running Tests
 ```bash
 # Backend tests
-cd backend/ProjectManagerAPI
-dotnet test
+cd backend/ProjectManagerAPI && dotnet test
 
-# Frontend tests
-cd frontend
-npm test
+# Frontend tests  
+cd frontend && npm test
+
+# Build verification
+dotnet publish -c Release
+npm run build
 ```
-
-## 🚀 Production Deployment
-
-This application is configured for deployment on Railway (backend) and Vercel (frontend).
-
-### Quick Deployment Steps
-
-1. **Push to GitHub:**
-   ```bash
-   git add .
-   git commit -m "Ready for deployment"
-   git push origin main
-   ```
-
-2. **Deploy Backend to Railway:**
-   - Go to [Railway.app](https://railway.app)
-   - Connect your GitHub repository
-   - Set environment variables:
-     - `ASPNETCORE_ENVIRONMENT=Production`
-     - `JWT_SECRET=your-super-secure-jwt-secret-key-minimum-32-characters`
-   - Railway will auto-deploy using the Dockerfile
-
-3. **Deploy Frontend to Vercel:**
-   - Go to [Vercel.com](https://vercel.com)
-   - Connect your GitHub repository
-   - Set environment variable:
-     - `REACT_APP_API_URL=https://your-railway-app.railway.app/api`
-   - Vercel will auto-deploy the React app
-
-### Deployment Files Included
-
-- `Dockerfile` - Railway backend deployment
-- `railway.json` - Railway configuration
-- `start.sh` - Fallback deployment script
-- `nixpacks.toml` - Alternative Railway config
-- `frontend/vercel.json` - Vercel configuration
-- `frontend/.env.production` - Production environment variables
-
-For detailed deployment instructions, see [DEPLOYMENT.md](DEPLOYMENT.md)
-
-## 🤝 Contributing
-
-1. Fork the repository 🍴
-2. Create a feature branch (`git checkout -b feature/amazing-feature`) 🌿
-3. Commit your changes (`git commit -m 'Add some amazing feature'`) 💾
-4. Push to the branch (`git push origin feature/amazing-feature`) 🚀
-5. Open a Pull Request 📬
+---
