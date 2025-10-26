@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { LoginData } from '../types';
+import ErrorModal from '../components/ErrorModal';
 
 const Login: React.FC = () => {
   const [formData, setFormData] = useState<LoginData>({
@@ -10,17 +11,38 @@ const Login: React.FC = () => {
   });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  
+  // Use a ref to persist error state across component remounts
+  const errorRef = useRef<string>('');
   
   const { login } = useAuth();
   const navigate = useNavigate();
 
+  // Restore error state if component remounts
+  useEffect(() => {
+    if (errorRef.current && !error) {
+      setError(errorRef.current);
+      setShowErrorModal(true);
+    }
+  }, [error]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // Clear error when user starts typing again
-    if (error) setError('');
+    if (error) {
+      setError('');
+      setShowErrorModal(false);
+      errorRef.current = '';
+    }
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
+  };
+
+  const handleCloseErrorModal = () => {
+    setShowErrorModal(false);
+    // Keep the error state but hide the modal
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -31,6 +53,8 @@ const Login: React.FC = () => {
     
     setIsLoading(true);
     setError(''); // Clear any existing error
+    setShowErrorModal(false);
+    errorRef.current = '';
 
     try {
       await login(formData);
@@ -40,6 +64,8 @@ const Login: React.FC = () => {
       // Set error message and keep it visible
       const errorMessage = error.response?.data?.message || 'Invalid credentials. Please try again.';
       setError(errorMessage);
+      setShowErrorModal(true);
+      errorRef.current = errorMessage; // Persist in ref
       
       // Don't navigate on error - stay on login page
     } finally {
@@ -48,57 +74,65 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.formContainer}>
-        <h2 style={styles.title}>Login</h2>
-        <form onSubmit={handleSubmit} style={styles.form} noValidate>
-          <div style={styles.inputGroup}>
-            <label htmlFor="usernameOrEmail">Username or Email</label>
-            <input
-              type="text"
-              id="usernameOrEmail"
-              name="usernameOrEmail"
-              value={formData.usernameOrEmail}
-              onChange={handleChange}
-              required
-              style={styles.input}
-              autoComplete="username"
-            />
-          </div>
-          <div style={styles.inputGroup}>
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              style={styles.input}
-              autoComplete="current-password"
-            />
-          </div>
-          {error && (
-            <div style={styles.error} role="alert">
-              {error}
+    <>
+      <ErrorModal 
+        isOpen={showErrorModal}
+        message={error}
+        onClose={handleCloseErrorModal}
+        title="Login Failed"
+      />
+      <div style={styles.container}>
+        <div style={styles.formContainer}>
+          <h2 style={styles.title}>Login</h2>
+          <form onSubmit={handleSubmit} style={styles.form} noValidate>
+            <div style={styles.inputGroup}>
+              <label htmlFor="usernameOrEmail">Username or Email</label>
+              <input
+                type="text"
+                id="usernameOrEmail"
+                name="usernameOrEmail"
+                value={formData.usernameOrEmail}
+                onChange={handleChange}
+                required
+                style={styles.input}
+                autoComplete="username"
+              />
             </div>
-          )}
-          <button
-            type="submit"
-            disabled={isLoading}
-            style={{
-              ...styles.button,
-              backgroundColor: isLoading ? '#bdc3c7' : '#3498db',
-            }}
-          >
-            {isLoading ? 'Logging in...' : 'Login'}
-          </button>
-        </form>
-        <p style={styles.linkText}>
-          Don't have an account? <Link to="/register" style={styles.link}>Register here</Link>
-        </p>
+            <div style={styles.inputGroup}>
+              <label htmlFor="password">Password</label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                style={styles.input}
+                autoComplete="current-password"
+              />
+            </div>
+            {error && !showErrorModal && (
+              <div style={styles.error} role="alert">
+                {error}
+              </div>
+            )}
+            <button
+              type="submit"
+              disabled={isLoading}
+              style={{
+                ...styles.button,
+                backgroundColor: isLoading ? '#bdc3c7' : '#3498db',
+              }}
+            >
+              {isLoading ? 'Logging in...' : 'Login'}
+            </button>
+          </form>
+          <p style={styles.linkText}>
+            Don't have an account? <Link to="/register" style={styles.link}>Register here</Link>
+          </p>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

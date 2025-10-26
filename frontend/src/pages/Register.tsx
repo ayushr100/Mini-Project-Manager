@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { RegisterData } from '../types';
+import ErrorModal from '../components/ErrorModal';
 
 const Register: React.FC = () => {
   const [formData, setFormData] = useState<RegisterData>({
@@ -11,17 +12,38 @@ const Register: React.FC = () => {
   });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  
+  // Use a ref to persist error state across component remounts
+  const errorRef = useRef<string>('');
   
   const { register } = useAuth();
   const navigate = useNavigate();
 
+  // Restore error state if component remounts
+  useEffect(() => {
+    if (errorRef.current && !error) {
+      setError(errorRef.current);
+      setShowErrorModal(true);
+    }
+  }, [error]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // Clear error when user starts typing again
-    if (error) setError('');
+    if (error) {
+      setError('');
+      setShowErrorModal(false);
+      errorRef.current = '';
+    }
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
+  };
+
+  const handleCloseErrorModal = () => {
+    setShowErrorModal(false);
+    // Keep the error state but hide the modal
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -32,6 +54,8 @@ const Register: React.FC = () => {
     
     setIsLoading(true);
     setError(''); // Clear any existing error
+    setShowErrorModal(false);
+    errorRef.current = '';
 
     try {
       await register(formData);
@@ -41,6 +65,8 @@ const Register: React.FC = () => {
       // Set error message and keep it visible
       const errorMessage = error.response?.data?.message || 'Registration failed. Please try again.';
       setError(errorMessage);
+      setShowErrorModal(true);
+      errorRef.current = errorMessage; // Persist in ref
       
       // Don't navigate on error - stay on register page
     } finally {
@@ -49,72 +75,80 @@ const Register: React.FC = () => {
   };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.formContainer}>
-        <h2 style={styles.title}>Register</h2>
-        <form onSubmit={handleSubmit} style={styles.form} noValidate>
-          <div style={styles.inputGroup}>
-            <label htmlFor="username">Username</label>
-            <input
-              type="text"
-              id="username"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-              required
-              style={styles.input}
-              maxLength={50}
-            />
-          </div>
-          <div style={styles.inputGroup}>
-            <label htmlFor="email">Email</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-              style={styles.input}
-              maxLength={100}
-            />
-          </div>
-          <div style={styles.inputGroup}>
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              style={styles.input}
-              minLength={6}
-              maxLength={100}
-            />
-            <small style={styles.helpText}>Password must be at least 6 characters long</small>
-          </div>
-          {error && (
-            <div style={styles.error} role="alert">
-              {error}
+    <>
+      <ErrorModal 
+        isOpen={showErrorModal}
+        message={error}
+        onClose={handleCloseErrorModal}
+        title="Registration Failed"
+      />
+      <div style={styles.container}>
+        <div style={styles.formContainer}>
+          <h2 style={styles.title}>Register</h2>
+          <form onSubmit={handleSubmit} style={styles.form} noValidate>
+            <div style={styles.inputGroup}>
+              <label htmlFor="username">Username</label>
+              <input
+                type="text"
+                id="username"
+                name="username"
+                value={formData.username}
+                onChange={handleChange}
+                required
+                style={styles.input}
+                maxLength={50}
+              />
             </div>
-          )}
-          <button
-            type="submit"
-            disabled={isLoading}
-            style={{
-              ...styles.button,
-              backgroundColor: isLoading ? '#bdc3c7' : '#27ae60',
-            }}
-          >
-            {isLoading ? 'Registering...' : 'Register'}
-          </button>
-        </form>
-        <p style={styles.linkText}>
-          Already have an account? <Link to="/login" style={styles.link}>Login here</Link>
-        </p>
+            <div style={styles.inputGroup}>
+              <label htmlFor="email">Email</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                style={styles.input}
+                maxLength={100}
+              />
+            </div>
+            <div style={styles.inputGroup}>
+              <label htmlFor="password">Password</label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                style={styles.input}
+                minLength={6}
+                maxLength={100}
+              />
+              <small style={styles.helpText}>Password must be at least 6 characters long</small>
+            </div>
+            {error && !showErrorModal && (
+              <div style={styles.error} role="alert">
+                {error}
+              </div>
+            )}
+            <button
+              type="submit"
+              disabled={isLoading}
+              style={{
+                ...styles.button,
+                backgroundColor: isLoading ? '#bdc3c7' : '#27ae60',
+              }}
+            >
+              {isLoading ? 'Registering...' : 'Register'}
+            </button>
+          </form>
+          <p style={styles.linkText}>
+            Already have an account? <Link to="/login" style={styles.link}>Login here</Link>
+          </p>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
